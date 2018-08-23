@@ -64,7 +64,7 @@ public class MwForge {
     	}
     }
 
-    @SubscribeEvent
+    /*@SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event){
         if (event.phase == TickEvent.Phase.START){
         	// run the cleanup code when Mw is loaded and the player becomes null.
@@ -73,5 +73,5 @@ public class MwForge {
                 Mw.instance.close();
             }
         }
-    }
+    }*/
 }

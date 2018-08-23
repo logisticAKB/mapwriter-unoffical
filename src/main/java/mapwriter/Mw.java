@@ -576,11 +576,11 @@ public class Mw {
 	// Event handlers
 	////////////////////////////////
 
-	public void syncConfig() {
+	/*public void syncConfig() {
 		this.markerManager.save(this.worldConfig, catMarkers);
 		this.saveWorldConfig();
 		this.saveConfig();
-	}
+	}*/
 
 	public void onWorldLoad(World world) {
 		//MwUtil.log("onWorldLoad: %s, name %s, dimension %d",
@@ -600,7 +600,8 @@ public class Mw {
 		//		world,
 		//		world.getWorldInfo().getWorldName(),
 		//		world.provider.dimensionId);
-		this.syncConfig();
+		//this.syncConfig();
+		this.close();
 	}
 	
 	public void onTick() {
