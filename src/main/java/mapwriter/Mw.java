@@ -588,7 +588,7 @@ public class Mw {
 
 	public void onConfigChanged() {
 		cfgUpdateReady = false;
-		MwUtil.log("Updating config...");
+		//MwUtil.log("Updating config...");
 		this.markerManager.save(this.worldConfig, catMarkers);
 		this.saveWorldConfig();
 		this.saveConfig();
