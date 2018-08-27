@@ -8,7 +8,7 @@ import org.lwjgl.input.Keyboard;
 public class MwGuiTextDialog extends GuiScreen {
 
 	private final GuiScreen parentScreen;
-	
+
 	String title;
 	String text;
 	String error;

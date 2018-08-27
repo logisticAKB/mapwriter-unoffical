@@ -20,6 +20,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class MwGuiMarkerDialogNew extends GuiScreen
 {
+
 	private final GuiScreen parentScreen;
 	String title = "";
 	String titleNew = "mw.gui.mwguimarkerdialognew.title.new";
@@ -297,7 +298,6 @@ public class MwGuiMarkerDialogNew extends GuiScreen
 					colour);
 			this.markerManager.setVisibleGroupName(this.markerGroup);
 			this.markerManager.update();
-
 		}
 		return inputCorrect;
 	}
