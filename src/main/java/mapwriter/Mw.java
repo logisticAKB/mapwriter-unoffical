@@ -13,6 +13,7 @@ import mapwriter.region.RegionManager;
 import mapwriter.tasks.CloseRegionManagerTask;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGameOver;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.ChatComponentText;
@@ -120,6 +121,9 @@ public class Mw {
 	public boolean ready = false;
 	public boolean multiplayer = false;
 	public int tickCounter = 0;
+	public boolean cfgChanged = false;
+	public int prevSize = 0;
+	public boolean cfgUpdateReady = true;
 	
 	// list of available dimensions
 	public List<Integer> dimensionList = new ArrayList<Integer>();
@@ -222,10 +226,16 @@ public class Mw {
 		this.backgroundTextureMode = this.config.getOrSetInt(catOptions, "backgroundTextureMode", this.backgroundTextureMode, 0, 1);
 		//this.lightingEnabled = this.config.getOrSetBoolean(catOptions, "lightingEnabled", this.lightingEnabled);
 		this.newMarkerDialog = this.config.getOrSetBoolean(catOptions, "newMarkerDialog", this.newMarkerDialog);
-		
+
+		/*MwUtil.log("maxZoomAfter(%d)", this.maxZoom);
+		MwUtil.log("minZoomAfter(%d)", this.minZoom);*/
+
 		this.maxZoom = this.config.getOrSetInt(catOptions, "zoomOutLevels", this.maxZoom, 1, 256);
 		this.minZoom = -this.config.getOrSetInt(catOptions, "zoomInLevels", -this.minZoom, 1, 256);
-		
+
+		/*MwUtil.log("maxZoom(%d)", this.maxZoom);
+		MwUtil.log("minZoom(%d)", this.minZoom);*/
+
 		this.configTextureSize = this.config.getOrSetInt(catOptions, "textureSize", this.configTextureSize, 1024, 8192);
 		this.setTextureSize();
 	}
@@ -526,7 +536,7 @@ public class Mw {
 			//printBoth("recreating zoom levels");
 			//this.regionManager.recreateAllZoomLevels();
 		//}
-		
+		prevSize = markerManager.markerList.size();
 		MwUtil.log("Mw.load: Done");
 	}
 	
@@ -576,11 +586,16 @@ public class Mw {
 	// Event handlers
 	////////////////////////////////
 
-	/*public void syncConfig() {
+	public void onConfigChanged() {
+		cfgUpdateReady = false;
+		MwUtil.log("Updating config...");
 		this.markerManager.save(this.worldConfig, catMarkers);
 		this.saveWorldConfig();
 		this.saveConfig();
-	}*/
+		this.cfgChanged = false;
+		prevSize = markerManager.markerList.size();
+		cfgUpdateReady = true;
+	}
 
 	public void onWorldLoad(World world) {
 		//MwUtil.log("onWorldLoad: %s, name %s, dimension %d",
@@ -647,7 +662,12 @@ public class Mw {
 	    	//	MwUtil.log("tick %d", this.tickCounter);
 	    	//}
 	    	this.playerTrail.onTick();
-	    	
+
+	    	if (this.cfgChanged ||
+					(markerManager.markerList.size() != prevSize && cfgUpdateReady)) {
+	    		onConfigChanged();
+			}
+
 			this.tickCounter++;
 		}
 	}
@@ -687,7 +707,7 @@ public class Mw {
 			this.markerManager.addMarker(MwUtil.getCurrentDateString(), "playerDeaths", this.playerXInt, this.playerYInt, this.playerZInt, this.playerDimension, 0xffff0000);
 			this.markerManager.setVisibleGroupName("playerDeaths");
 			this.markerManager.update();
-			//this.savecfg();
+			this.cfgChanged = true;
 		}
 	}
 	
@@ -740,7 +760,6 @@ public class Mw {
     						)
     					);
         		}
-			
 			} else if (kb == MwKeyHandler.keyNextGroup) {
 				// toggle marker mode
 				this.markerManager.nextGroup();

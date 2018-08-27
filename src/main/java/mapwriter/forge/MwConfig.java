@@ -22,6 +22,9 @@ public class MwConfig extends Configuration {
 	
 	public int getOrSetInt(String category, String key, int defaultValue, int minValue, int maxValue) {
 		int value = this.get(category, key, defaultValue).getInt();
+
+		//MwUtil.log("value(%d)", value);
+
 		return Math.min(Math.max(minValue, value), maxValue);
 	}
 	
