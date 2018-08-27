@@ -78,7 +78,7 @@ public class MapView {
 	}
 	
 	public int setZoomLevel(int zoomLevel) {
-		MwUtil.log("MapView.setZoomLevel(%d)", zoomLevel);
+		//MwUtil.log("MapView.setZoomLevel(%d)", zoomLevel);
 		int prevZoomLevel = this.zoomLevel;
 		if (this.undergroundMode) {
 			this.zoomLevel = Math.min(Math.max(this.minZoom, zoomLevel), 0);
