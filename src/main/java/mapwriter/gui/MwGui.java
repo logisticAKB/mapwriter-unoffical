@@ -57,7 +57,9 @@ public class MwGui extends GuiScreen {
     private Label dimensionLabel;
     private Label groupLabel;
     private Label overlayLabel;
-    
+
+    private boolean providerWasChanged = false;
+
     class Label {
     	int x = 0, y = 0, w = 1, h = 12;
     	public Label() {
@@ -321,7 +323,16 @@ public class MwGui extends GuiScreen {
     	}
     	super.handleMouseInput();
     }
-    
+
+    @Override
+    protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+    	if (mapView.getZoomLevel() >= 1 && MwAPI.getCurrentProviderName().equals("Grid")) {
+    		MwAPI.setCurrentDataProvider("None");
+    		this.providerWasChanged = true;
+		}
+    	super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+	}
+
     // mouse button clicked. 0 = LMB, 1 = RMB, 2 = MMB
     protected void mouseClicked(int x, int y, int button) {
     	//MwUtil.log("MwGui.mouseClicked(%d, %d, %d)", x, y, button);
@@ -448,6 +459,11 @@ public class MwGui extends GuiScreen {
     	} else if (button == 1) {
     		//this.mouseRightHeld = 0;
     	}
+
+    	if (this.providerWasChanged) {
+    		MwAPI.setCurrentDataProvider("Grid");
+    		this.providerWasChanged = false;
+		}
     }
     
     // zoom on mouse direction wheel scroll
@@ -459,7 +475,7 @@ public class MwGui extends GuiScreen {
     		} else {
     			marker.colourPrev();
     		}
-    		
+    		this.mw.cfgChanged = true;
     	} else if (this.dimensionLabel.posWithin(x, y)) {
     		int n = (direction > 0) ? 1 : -1;
 	    	this.mapView.nextDimension(this.mw.dimensionList, n);
@@ -597,6 +613,7 @@ public class MwGui extends GuiScreen {
     			double scale = this.mapView.getDimensionScaling(this.movingMarker.dimension);
         		this.movingMarker.x = this.movingMarkerXStart - (int) (xOffset / scale);
         		this.movingMarker.z = this.movingMarkerZStart - (int) (yOffset / scale);
+        		this.mw.cfgChanged = true;
     		} else {
 	    		this.mapView.setViewCentre(this.viewXStart + xOffset, this.viewZStart + yOffset);
     		}

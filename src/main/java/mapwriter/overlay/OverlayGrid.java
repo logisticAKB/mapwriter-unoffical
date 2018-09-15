@@ -3,6 +3,7 @@ package mapwriter.overlay;
 import java.awt.Point;
 import java.util.ArrayList;
 
+import mapwriter.MwUtil;
 import mapwriter.api.IMwChunkOverlay;
 import mapwriter.api.IMwDataProvider;
 import mapwriter.map.MapView;
@@ -10,6 +11,8 @@ import mapwriter.map.mapmode.MapMode;
 import net.minecraft.util.MathHelper;
 
 public class OverlayGrid implements IMwDataProvider {
+
+	private float borderWidth = 0.5f;
 
 	public class ChunkOverlay implements IMwChunkOverlay{
 
@@ -32,7 +35,7 @@ public class OverlayGrid implements IMwDataProvider {
 		public boolean hasBorder() { return true; }
 
 		@Override
-		public float getBorderWidth() { return 0.5f; }
+		public float getBorderWidth() { return borderWidth; }
 
 		@Override
 		public int getBorderColor() { return 0xff000000; }
@@ -65,7 +68,7 @@ public class OverlayGrid implements IMwDataProvider {
 	public String getStatusString(int dim, int bX, int bY, int bZ) { return "";	}
 
 	@Override
-	public void onMiddleClick(int dim, int bX, int bZ, MapView mapview){	}
+	public void onMiddleClick(int dim, int bX, int bZ, MapView mapview){ 	}
 
 	@Override
 	public void onDimensionChanged(int dimension, MapView mapview) {	}
@@ -77,9 +80,12 @@ public class OverlayGrid implements IMwDataProvider {
 
 	@Override
 	public void onZoomChanged(int level, MapView mapview) {
-		/*if (level >= -1) {
-			mapview.setZoomLevel(-1);
-		}*/
+		/*if (level <= 0) borderWidth = 0.6f;
+		else if (level == 1) borderWidth = 0.5f;
+		else if (level == 2) borderWidth = 0.4f;
+		else if (level == 3) borderWidth = 0.3f;
+		else if (level == 4) borderWidth = 0.2f;
+		else borderWidth = 0.1f;*/
 	}
 
 	@Override
