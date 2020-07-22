@@ -9,7 +9,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class MwGuiMarkerDialog extends MwGuiTextDialog {
-
 	private final MarkerManager markerManager;
 	private Marker editingMarker;
 	private String markerName = "";

@@ -8,9 +8,7 @@ import mapwriter.Render;
 import mapwriter.map.mapmode.MapMode;
 
 public class Trail {
-
-	private Mw mw;
-
+	
 	class TrailMarker {
 		
 		double x, y, z, heading;
@@ -44,7 +42,7 @@ public class Trail {
 		}
 	}
 	
-
+	private Mw mw;
 	public LinkedList<TrailMarker> trailMarkerList = new LinkedList<TrailMarker>();
 	public int maxLength = 30;
 	public String name;

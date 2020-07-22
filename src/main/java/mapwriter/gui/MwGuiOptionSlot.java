@@ -32,6 +32,7 @@ public class MwGuiOptionSlot extends GuiSlot {
 		I18n.format("mw.gui.mwguioptionslot.drawCoords.large")
 	};
 	private static final String[] backgroundModeStringArray = {
+		I18n.format("mw.gui.mwguioptionslot.backgroundMode.minecraft"),
 		I18n.format("mw.gui.mwguioptionslot.backgroundMode.none"),
 		I18n.format("mw.gui.mwguioptionslot.backgroundMode.static"),
 		I18n.format("mw.gui.mwguioptionslot.backgroundMode.panning")
@@ -198,7 +199,7 @@ public class MwGuiOptionSlot extends GuiSlot {
 			break;
 		case 11:
 			// background texture mode
-			this.mw.backgroundTextureMode = (this.mw.backgroundTextureMode + 1) % 3;
+			this.mw.backgroundTextureMode = (this.mw.backgroundTextureMode + 1) % 4;
 			break;
 		//case 11:
 		//	// lighting

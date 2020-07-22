@@ -2,6 +2,7 @@ package mapwriter.forge;
 
 import java.net.InetSocketAddress;
 
+import net.minecraftforge.event.world.WorldEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,6 +21,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
+import org.lwjgl.Sys;
 
 @Mod(modid="MapWriter", name="MapWriter", version="2.1.8", acceptableRemoteVersions = "*")
 public class MwForge {
@@ -64,7 +66,7 @@ public class MwForge {
     	}
     }
 
-    /*@SubscribeEvent
+    @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event){
         if (event.phase == TickEvent.Phase.START){
         	// run the cleanup code when Mw is loaded and the player becomes null.
@@ -73,5 +75,13 @@ public class MwForge {
                 Mw.instance.close();
             }
         }
-    }*/
+    }
+
+    @SubscribeEvent
+    public void onWorldUnload(WorldEvent.Unload event) {
+	    if (Mw.instance.lastSavedTick != Mw.instance.tickCounter) {
+            Mw.instance.saveCfgAndMarkers();
+            Mw.instance.lastSavedTick = Mw.instance.tickCounter;
+        }
+    }
 }

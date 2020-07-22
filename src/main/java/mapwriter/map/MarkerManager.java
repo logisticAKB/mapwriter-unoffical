@@ -3,15 +3,12 @@ package mapwriter.map;
 import java.util.ArrayList;
 import java.util.List;
 
-import mapwriter.Mw;
 import mapwriter.MwUtil;
 import mapwriter.forge.MwConfig;
 import mapwriter.map.mapmode.MapMode;
 
 public class MarkerManager {
-
-	Mw mw;
-
+	
 	public List<Marker> markerList = new ArrayList<Marker>();
 	public List<String> groupList = new ArrayList<String>();
 	

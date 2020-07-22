@@ -3,7 +3,7 @@ package mapwriter.overlay;
 import java.awt.Point;
 import java.util.ArrayList;
 
-import mapwriter.MwUtil;
+import mapwriter.Mw;
 import mapwriter.api.IMwChunkOverlay;
 import mapwriter.api.IMwDataProvider;
 import mapwriter.map.MapView;
@@ -12,13 +12,14 @@ import net.minecraft.util.MathHelper;
 
 public class OverlayGrid implements IMwDataProvider {
 
-	private float borderWidth = 0.5f;
-
 	public class ChunkOverlay implements IMwChunkOverlay{
 
+		private Mw mw;
 		Point coord;
+		float borderWidth = 0.5f;
 		
-		public ChunkOverlay(int x, int z){
+		public ChunkOverlay(Mw mw, int x, int z) {
+			this.mw = mw;
 			this.coord = new Point(x, z);
 		}
 		
@@ -38,12 +39,18 @@ public class OverlayGrid implements IMwDataProvider {
 		public float getBorderWidth() { return borderWidth; }
 
 		@Override
-		public int getBorderColor() { return 0xff000000; }
+		public int getBorderColor() {
+			if (this.mw.backgroundTextureMode == 0) {
+				return 0x8021140e; //0x6021140e
+			} else {
+				return 0xff000000;
+			}
+		}
 		
 	}
 	
 	@Override
-	public ArrayList<IMwChunkOverlay> getChunksOverlay(int dim, double centerX, double centerZ, double minX, double minZ, double maxX, double maxZ) {
+	public ArrayList<IMwChunkOverlay> getChunksOverlay(Mw mw, int dim, double centerX, double centerZ, double minX, double minZ, double maxX, double maxZ) {
 		int minChunkX = (MathHelper.ceiling_double_int(minX) >> 4) - 1;
 		int minChunkZ = (MathHelper.ceiling_double_int(minZ) >> 4) - 1;
 		int maxChunkX = (MathHelper.ceiling_double_int(maxX) >> 4) + 1;
@@ -59,7 +66,7 @@ public class OverlayGrid implements IMwDataProvider {
 		ArrayList<IMwChunkOverlay> chunks = new ArrayList<IMwChunkOverlay>();
 		for (int x = limitMinX; x <= limitMaxX; x++)
 			for (int z = limitMinZ; z <= limitMaxZ; z++)
-				chunks.add(new ChunkOverlay(x, z));
+				chunks.add(new ChunkOverlay(mw, x, z));
 				
 		return chunks;
 	}
@@ -68,31 +75,24 @@ public class OverlayGrid implements IMwDataProvider {
 	public String getStatusString(int dim, int bX, int bY, int bZ) { return "";	}
 
 	@Override
-	public void onMiddleClick(int dim, int bX, int bZ, MapView mapview){ 	}
+	public void onMiddleClick(int dim, int bX, int bZ, MapView mapview){	}
 
 	@Override
 	public void onDimensionChanged(int dimension, MapView mapview) {	}
 
 	@Override
 	public void onMapCenterChanged(double vX, double vZ, MapView mapview) {
-
+		
 	}
 
 	@Override
 	public void onZoomChanged(int level, MapView mapview) {
-		/*if (level <= 0) borderWidth = 0.6f;
-		else if (level == 1) borderWidth = 0.5f;
-		else if (level == 2) borderWidth = 0.4f;
-		else if (level == 3) borderWidth = 0.3f;
-		else if (level == 4) borderWidth = 0.2f;
-		else borderWidth = 0.1f;*/
+
 	}
 
 	@Override
 	public void onOverlayActivated(MapView mapview) {
-		/*if (mapview.getZoomLevel() > -1) {
-			mapview.setZoomLevel(-1);
-		}*/
+		
 	}
 
 	@Override

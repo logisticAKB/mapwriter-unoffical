@@ -9,6 +9,7 @@ import mapwriter.api.IMwChunkOverlay;
 import mapwriter.api.IMwDataProvider;
 import mapwriter.api.MwAPI;
 import mapwriter.map.mapmode.MapMode;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
@@ -88,11 +89,18 @@ public class MapRenderer {
 			this.mw.mapTexture.requestView(req, this.mw.executor, this.mw.regionManager);
 			
 			// draw the background texture
-			if (this.mw.backgroundTextureMode > 0) {
+			if (this.mw.backgroundTextureMode == 0) {
+				Render.drawMcBackground(this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h,0);
+			}
+			else if (this.mw.backgroundTextureMode == 1) {
+				// mode 1, no background texture
+				Render.setColourWithAlphaPercent(0x000000, this.mapMode.alphaPercent);
+				Render.drawRect(this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h);
+			} else {
 				double bu1 = 0.0; double bu2 = 1.0;
 				double bv1 = 0.0; double bv2 = 1.0;
-				if (this.mw.backgroundTextureMode == 2) {
-					// background moves with map if mode is 2
+				if (this.mw.backgroundTextureMode == 3) {
+					// background moves with map if mode is 3
 					double bSize = tSize / 256.0;
 					bu1 = u * bSize; bu2 = (u + w) * bSize;
 					bv1 = v * bSize; bv2 = (v + h) * bSize;
@@ -103,10 +111,6 @@ public class MapRenderer {
 						this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h,
 						bu1, bv1, bu2, bv2
 				);
-			} else {
-				// mode 0, no background texture
-				Render.setColourWithAlphaPercent(0x000000, this.mapMode.alphaPercent);
-				Render.drawRect(this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h);
 			}
 			
 			// only draw surface map if the request is loaded (view requests are
@@ -240,7 +244,7 @@ public class MapRenderer {
    	 	//for (IMwDataProvider provider : MwAPI.getDataProviders())
 		IMwDataProvider provider = MwAPI.getCurrentDataProvider();
 		if (provider != null) {
-			ArrayList<IMwChunkOverlay> overlays = provider.getChunksOverlay(
+			ArrayList<IMwChunkOverlay> overlays = provider.getChunksOverlay(this.mw,
 					this.mapView.getDimension(),
 					this.mapView.getX(), this.mapView.getZ(),
 					this.mapView.getMinX(), this.mapView.getMinZ(),

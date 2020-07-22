@@ -13,7 +13,6 @@ import mapwriter.region.RegionManager;
 import mapwriter.tasks.CloseRegionManagerTask;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGameOver;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.ChatComponentText;
@@ -121,10 +120,8 @@ public class Mw {
 	public boolean ready = false;
 	public boolean multiplayer = false;
 	public int tickCounter = 0;
-	public boolean cfgChanged = false;
-	public int prevSize = 0;
-	public boolean cfgUpdateReady = true;
-	
+	public int lastSavedTick = 0;
+
 	// list of available dimensions
 	public List<Integer> dimensionList = new ArrayList<Integer>();
 	
@@ -159,6 +156,8 @@ public class Mw {
 	public Trail playerTrail = null;
 	
 	public static Mw instance;
+
+	public MwGui mwGui;
 	
 	public Mw(MwConfig config) {
 		// client only initialization
@@ -226,16 +225,10 @@ public class Mw {
 		this.backgroundTextureMode = this.config.getOrSetInt(catOptions, "backgroundTextureMode", this.backgroundTextureMode, 0, 1);
 		//this.lightingEnabled = this.config.getOrSetBoolean(catOptions, "lightingEnabled", this.lightingEnabled);
 		this.newMarkerDialog = this.config.getOrSetBoolean(catOptions, "newMarkerDialog", this.newMarkerDialog);
-
-		/*MwUtil.log("maxZoomAfter(%d)", this.maxZoom);
-		MwUtil.log("minZoomAfter(%d)", this.minZoom);*/
-
+		
 		this.maxZoom = this.config.getOrSetInt(catOptions, "zoomOutLevels", this.maxZoom, 1, 256);
 		this.minZoom = -this.config.getOrSetInt(catOptions, "zoomInLevels", -this.minZoom, 1, 256);
-
-		/*MwUtil.log("maxZoom(%d)", this.maxZoom);
-		MwUtil.log("minZoom(%d)", this.minZoom);*/
-
+		
 		this.configTextureSize = this.config.getOrSetInt(catOptions, "textureSize", this.configTextureSize, 1024, 8192);
 		this.setTextureSize();
 	}
@@ -536,7 +529,7 @@ public class Mw {
 			//printBoth("recreating zoom levels");
 			//this.regionManager.recreateAllZoomLevels();
 		//}
-		prevSize = markerManager.markerList.size();
+		
 		MwUtil.log("Mw.load: Done");
 	}
 	
@@ -563,8 +556,8 @@ public class Mw {
 			
 			this.playerTrail.close();
 			
-			this.markerManager.save(this.worldConfig, catMarkers); //save
-			this.markerManager.clear();
+//			this.markerManager.save(this.worldConfig, catMarkers);
+//			this.markerManager.clear();
 			
 			// close overlay
 			this.miniMap.close();
@@ -573,30 +566,31 @@ public class Mw {
 			this.undergroundMapTexture.close();
 			this.mapTexture.close();
 			
-			this.saveWorldConfig(); //save
-			this.saveConfig(); //save
+//			this.saveWorldConfig();
+//			this.saveConfig();
 			
 			this.tickCounter = 0;
 
             OverlaySlime.reset(); //Reset the state so the seed will be asked again when we log in
         }
 	}
-	
+
+	public void saveCfgAndMarkers() {
+		MwUtil.log("Saving markers and cfg...");
+
+		this.markerManager.save(this.worldConfig, catMarkers);
+		this.markerManager.clear();
+
+		this.saveWorldConfig();
+		this.saveConfig();
+
+		MwUtil.log("done");
+	}
+
 	////////////////////////////////
 	// Event handlers
 	////////////////////////////////
-
-	public void onConfigChanged() {
-		cfgUpdateReady = false;
-		//MwUtil.log("Updating config...");
-		this.markerManager.save(this.worldConfig, catMarkers);
-		this.saveWorldConfig();
-		this.saveConfig();
-		this.cfgChanged = false;
-		prevSize = markerManager.markerList.size();
-		cfgUpdateReady = true;
-	}
-
+	
 	public void onWorldLoad(World world) {
 		//MwUtil.log("onWorldLoad: %s, name %s, dimension %d",
 		//		world,
@@ -615,8 +609,6 @@ public class Mw {
 		//		world,
 		//		world.getWorldInfo().getWorldName(),
 		//		world.provider.dimensionId);
-		//this.syncConfig();
-		this.close();
 	}
 	
 	public void onTick() {
@@ -662,12 +654,7 @@ public class Mw {
 	    	//	MwUtil.log("tick %d", this.tickCounter);
 	    	//}
 	    	this.playerTrail.onTick();
-
-	    	if ((this.cfgChanged || markerManager.markerList.size() != prevSize)
-					&& cfgUpdateReady) {
-	    		onConfigChanged();
-			}
-
+	    	
 			this.tickCounter++;
 		}
 	}
@@ -707,7 +694,6 @@ public class Mw {
 			this.markerManager.addMarker(MwUtil.getCurrentDateString(), "playerDeaths", this.playerXInt, this.playerYInt, this.playerZInt, this.playerDimension, 0xffff0000);
 			this.markerManager.setVisibleGroupName("playerDeaths");
 			this.markerManager.update();
-			this.cfgChanged = true;
 		}
 	}
 	
@@ -722,7 +708,8 @@ public class Mw {
 				
 			} else if (kb == MwKeyHandler.keyMapGui) {
 				// open map gui
-				this.mc.displayGuiScreen(new MwGui(this));
+				this.mwGui = new MwGui(this);
+				this.mc.displayGuiScreen(this.mwGui);
 			
 			} else if (kb == MwKeyHandler.keyNewMarker) {
 				// open new marker dialog
@@ -760,6 +747,7 @@ public class Mw {
     						)
     					);
         		}
+			
 			} else if (kb == MwKeyHandler.keyNextGroup) {
 				// toggle marker mode
 				this.markerManager.nextGroup();
@@ -781,7 +769,6 @@ public class Mw {
 			} else if (kb == MwKeyHandler.keyZoomOut) {
 				// zoom out
 				this.miniMap.view.adjustZoomLevel(1);
-
 			} else if (kb == MwKeyHandler.keyUndergroundMode) {
 				this.toggleUndergroundMode();
 			}

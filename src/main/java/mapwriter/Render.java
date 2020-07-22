@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
 
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -20,6 +21,8 @@ This includes:
 public class Render {
 	public static double zDepth = 0.0D;
 	public static final double circleSteps = 30.0;
+
+	public static final ResourceLocation optionsBackground = new ResourceLocation("textures/gui/options_background.png");
 	
 	public static void setColourWithAlphaPercent(int colour, int alphaPercent) {
 		setColour(((((alphaPercent * 0xff) / 100) & 0xff) << 24) | (colour & 0xffffff));
@@ -196,6 +199,23 @@ public class Render {
         tes.draw();
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glDisable(GL11.GL_BLEND);
+	}
+
+	public static void drawMcBackground(double x, double y, double w, double h, int tint) {
+		Minecraft mc = Minecraft.getMinecraft();
+		GL11.glDisable(GL11.GL_LIGHTING);
+		GL11.glDisable(GL11.GL_FOG);
+		Tessellator tessellator = Tessellator.instance;
+		mc.getTextureManager().bindTexture(optionsBackground);
+		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		float f = 16.0F;
+		tessellator.startDrawingQuads();
+		tessellator.setColorOpaque_I(4210752);
+		tessellator.addVertexWithUV(x + w, y, 0.0D, 0.0D, (double)((float)y / f + (float)tint));
+		tessellator.addVertexWithUV(x, y, 0.0D, (double)((float)x / f), (double)((float)y / f + (float)tint));
+		tessellator.addVertexWithUV(x, y + h, 0.0D, (double)((float)x / f), (double)tint);
+		tessellator.addVertexWithUV(x + w, y + h, 0.0D, 0.0D, (double)tint);
+		tessellator.draw();
 	}
 	
 	public static void drawRect(double x, double y, double w, double h) {

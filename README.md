@@ -8,7 +8,8 @@ Instructions for development:
 
 1) Run "gradlew setupDecompWorkspace" in the mapwriter folder.
 
-2) Run "gradlew eclipse" if using the eclipse IDE. If it does not work you may
+2) Run "gradlew eclipse" if using the eclipse IDE or "gradlew idea" if using the IntelliJ IDEA IDE.
+   If it does not work you may
    need to copy the eclipse folder from a Forge src release into the mapwriter
    folder and retry the command.
 
