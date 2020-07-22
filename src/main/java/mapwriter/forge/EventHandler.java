@@ -8,7 +8,6 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
-import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class EventHandler {
@@ -18,7 +17,7 @@ public class EventHandler {
 	public EventHandler(Mw mw) {
 		this.mw = mw;
 	}
-	
+
 	@SubscribeEvent
 	public void eventChunkLoad(ChunkEvent.Load event){
 		if(event.world.isRemote){
