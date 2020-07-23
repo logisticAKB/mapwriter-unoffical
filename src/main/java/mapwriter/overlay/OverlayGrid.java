@@ -82,7 +82,7 @@ public class OverlayGrid implements IMwDataProvider {
 
 	@Override
 	public void onMapCenterChanged(double vX, double vZ, MapView mapview) {
-		
+
 	}
 
 	@Override
@@ -92,7 +92,9 @@ public class OverlayGrid implements IMwDataProvider {
 
 	@Override
 	public void onOverlayActivated(MapView mapview) {
-		
+		/*if (mapview.getZoomLevel() > -1) {
+			mapview.setZoomLevel(-1);
+		}*/
 	}
 
 	@Override
