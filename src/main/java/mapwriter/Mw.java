@@ -579,7 +579,6 @@ public class Mw {
 		MwUtil.log("Saving markers and cfg...");
 
 		this.markerManager.save(this.worldConfig, catMarkers);
-		this.markerManager.clear();
 
 		this.saveWorldConfig();
 		this.saveConfig();
