@@ -536,7 +536,6 @@ public class Mw {
 			//printBoth("recreating zoom levels");
 			//this.regionManager.recreateAllZoomLevels();
 		//}
-		prevSize = markerManager.markerList.size();
 		MwUtil.log("Mw.load: Done");
 	}
 	
@@ -660,11 +659,6 @@ public void saveCfgAndMarkers() {
 	    	//	MwUtil.log("tick %d", this.tickCounter);
 	    	//}
 	    	this.playerTrail.onTick();
-
-	    	if (this.cfgChanged ||
-					(markerManager.markerList.size() != prevSize && cfgUpdateReady)) {
-	    		onConfigChanged();
-			}
 
 			this.tickCounter++;
 		}
