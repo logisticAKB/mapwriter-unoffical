@@ -65,6 +65,14 @@ public class MiniMap {
 		this.nextOverlayMode(0);
 		this.currentMap = this.mapList.get(this.modeIndex);
 	}
+
+	public void save() {
+		this.smallMapMode.close();
+		this.largeMapMode.close();
+
+		this.mw.config.setInt(Mw.catOptions, "overlayModeIndex", this.modeIndex);
+		this.mw.config.setInt(Mw.catOptions, "overlayZoomLevel", this.view.getZoomLevel());
+	}
 	
 	public void close() {
 		this.mapList.clear();

@@ -58,7 +58,7 @@ public class ChunkManager {
 	}
 	
 	public synchronized void addChunk(Chunk chunk) {
-		if (!this.closed && (chunk != null)) {
+		if (!this.closed && (chunk != null) && !this.chunkMap.containsKey(chunk)) {
 			this.chunkMap.put(chunk, 0);
 		}
 	}
@@ -101,40 +101,71 @@ public class ChunkManager {
 	}
 	
 	public void updateSurfaceChunks() {
-		int chunksToUpdate = Math.min(this.chunkMap.size(), this.mw.chunksPerTick);
-		MwChunk[] chunkArray = new MwChunk[chunksToUpdate];
-		for (int i = 0; i < chunksToUpdate; i++) {
-			Map.Entry<Chunk, Integer> entry = this.chunkMap.getNextEntry();
-			if (entry != null) {
-				// if this chunk is within a certain distance to the player then
-				// add it to the viewed set
-				Chunk chunk = entry.getKey();
+		int chunkArrayX = (this.mw.playerXInt >> 4) - (this.mw.renderRadius - 1);
+		int chunkArrayZ = (this.mw.playerZInt >> 4) - (this.mw.renderRadius - 1);
 
-				int flags = entry.getValue();
-				if (MwUtil.distToChunkSq(this.mw.playerXInt, this.mw.playerZInt, chunk) <= this.mw.maxChunkSaveDistSq) {
-					flags |= (VISIBLE_FLAG | VIEWED_FLAG);
-				} else {
-					flags &= ~VISIBLE_FLAG;
-				}
-				entry.setValue(flags);
-				
-				if ((flags & VISIBLE_FLAG) != 0) {
-					chunkArray[i] = copyToMwChunk(chunk);
-				} else {
-					chunkArray[i] = null;
+		for (int z = 0; z < 2*this.mw.renderRadius - 1; z++) {
+			for (int x = 0; x < 2*this.mw.renderRadius - 1; x++) {
+				Chunk chunk = this.mw.mc.theWorld.getChunkFromChunkCoords(
+						chunkArrayX + x,
+						chunkArrayZ + z
+				);
+				if (!chunk.isEmpty()) {
+					this.addChunk(chunk);
 				}
 			}
 		}
-		
+
+		MwChunk[] chunkArray = new MwChunk[this.chunkMap.size()];
+
+		for (int i = 0; i < this.chunkMap.size(); i++) {
+			Map.Entry<Chunk, Integer> entry = this.chunkMap.getNextEntry();
+			Chunk chunk = entry.getKey();
+			chunkArray[i] = copyToMwChunk(chunk);
+		}
 		this.mw.executor.addTask(new UpdateSurfaceChunksTask(this.mw, chunkArray));
+//		MwUtil.log("chunk updating now: %d", this.chunkMap.size());
+		this.chunkMap.clear();
 	}
-	
+
+//	public void updateSurfaceChunks() {
+////		int chunksToUpdate = Math.min(this.chunkMap.size(), this.mw.chunksPerTick);
+//		int chunksToUpdate = this.chunkMap.size();
+//		MwChunk[] chunkArray = new MwChunk[chunksToUpdate];
+//		for (int i = 0; i < chunksToUpdate; i++) {
+//			Map.Entry<Chunk, Integer> entry = this.chunkMap.getNextEntry();
+//			if (entry != null) {
+//				// if this chunk is within a certain distance to the player then
+//				// add it to the viewed set
+//				Chunk chunk = entry.getKey();
+//
+//				int flags = entry.getValue();
+//				if (MwUtil.distToChunkSq(this.mw.playerXInt, this.mw.playerZInt, chunk) <= this.mw.maxChunkSaveDistSq) {
+//					flags |= (VISIBLE_FLAG | VIEWED_FLAG);
+//				} else {
+//					flags &= ~VISIBLE_FLAG;
+//				}
+//				entry.setValue(flags);
+//
+//				if ((flags & VISIBLE_FLAG) != 0) {
+//					chunkArray[i] = copyToMwChunk(chunk);
+//				} else {
+//					chunkArray[i] = null;
+//				}
+//			}
+//		}
+//
+//		this.mw.executor.addTask(new UpdateSurfaceChunksTask(this.mw, chunkArray));
+//	}
+
 	public void onTick() {
 		if (!this.closed) {
 			if ((this.mw.tickCounter & 0xf) == 0) {
 				this.updateUndergroundChunks();
 			} else {
-				this.updateSurfaceChunks();
+				if (this.mw.ticksBetweenUpdates == 0 || this.mw.tickCounter % this.mw.ticksBetweenUpdates == 0) {
+					this.updateSurfaceChunks();
+				}
 			}
 		}
 	}

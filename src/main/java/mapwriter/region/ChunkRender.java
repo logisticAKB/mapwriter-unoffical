@@ -1,5 +1,7 @@
 package mapwriter.region;
 
+import mapwriter.Mw;
+
 public class ChunkRender {
 	
 	public static final byte FLAG_UNPROCESSED = 0;
@@ -77,9 +79,15 @@ public class ChunkRender {
 		double b = 0.0;
 		for (; y > 0; y--) {
 			int blockAndMeta = chunk.getBlockAndMetadata(x, y, z);
-			
+
 			int c1 = bc.getColour(blockAndMeta);
 			int alpha = (c1 >> 24) & 0xff;
+
+			if (c1 == -8650628)
+			{
+				alpha = 0;
+			}
+
 			// no need to process block if it is transparent
 			if (alpha > 0) {
 				int biome = chunk.getBiome(x, z);
@@ -107,7 +115,7 @@ public class ChunkRender {
 				break;
 			}
 		}
-		
+
 		/*
 		// darken blocks depending on how far away they are from this depth slice
 		if (depth != 0) {
@@ -126,12 +134,12 @@ public class ChunkRender {
 		r = Math.min(Math.max(0.0, r * shading), 1.0);
 		g = Math.min(Math.max(0.0, g * shading), 1.0);
 		b = Math.min(Math.max(0.0, b * shading), 1.0);
-		
+
 		// now we have our final RGB values as doubles, convert to a packed ARGB pixel.
 		return ((y & 0xff) << 24) |
-			((((int) (r * 255.0)) & 0xff) << 16) |
-			((((int) (g * 255.0)) & 0xff) << 8) |
-			((((int) (b * 255.0)) & 0xff));
+				((((int) (r * 255.0)) & 0xff) << 16) |
+				((((int) (g * 255.0)) & 0xff) << 8) |
+				((((int) (b * 255.0)) & 0xff));
 	}
 	
 	static int getPixelHeightN(int[] pixels, int offset, int scanSize) {
@@ -166,7 +174,7 @@ public class ChunkRender {
 				
 				int pixelOffset = offset + (z * scanSize) + x;
 				pixels[pixelOffset] = getColumnColour(
-					bc, chunk, x, y, z, 
+					bc, chunk, x, y, z,
 					getPixelHeightW(pixels, pixelOffset, scanSize),
 					getPixelHeightN(pixels, pixelOffset, scanSize)
 				);
