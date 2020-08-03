@@ -43,7 +43,7 @@ public class MwGuiMarkerSlot extends GuiSlot {
         this.buttonId.clear();
         for (int i = 0; i < this.markerList.size(); i++) {
             Marker marker = this.markerList.get(i);
-            if (text.equals("") || marker.name.toLowerCase().contains(text.toLowerCase())) {
+            if ((text.equals("") || marker.name.toLowerCase().contains(text.toLowerCase())) && marker.dimension == this.mw.playerDimension) {
                 this.buttons.add(new GuiButton(400 + i, 0, 0, this.markerList.get(i).name));
                 this.buttonId.add(i);
             }
